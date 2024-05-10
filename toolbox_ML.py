@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import seaborn as sns
 import matplotlib.pyplot as plt
-from scipy.stats import chi2_contingency, pearsonr
+import scipy.stats as stats
+from scipy.stats import chi2_contingency, pearsonr, f_oneway
 
 def describe_df(df):
     '''
