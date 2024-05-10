@@ -16,10 +16,10 @@ def describe_df(df):
     '''
     resumen = pd.DataFrame({
         'Tipo de dato': df.dtypes,
-        'Porcentaje de nulos': df.isnull().mean() * 100,
+        'Porcentaje de nulos': round(df.isnull().mean() * 100,2),
         'Valores únicos': df.nunique()
     })
-    resumen['Porcentaje de cardinalidad'] = (resumen['Valores únicos'] / len(df)) * 100
+    resumen['Porcentaje de cardinalidad'] = round(resumen['Valores únicos'] / len(df) * 100,2)
     return resumen.transpose()
 
 # Simple funcion para clasificar y que el código quede mas bonito
