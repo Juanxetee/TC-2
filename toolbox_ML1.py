@@ -81,7 +81,7 @@ def plot_features_num_regression(df, target_col="", columns=[], umbral_corr=0, p
     sns.pairplot(df, vars=[target_col] + selected_features)
     plt.show()
     return selected_features
-
+  
 def get_features_cat_regression(df, target_col, pvalue=0.05):
     """
     Obtiene las características categóricas significativas para un modelo de regresión.
@@ -94,14 +94,16 @@ def get_features_cat_regression(df, target_col, pvalue=0.05):
     Retorna:
     list or None: Una lista con las características categóricas significativas para el modelo de regresión, o None si hay errores.
     """
-    if df.empty or target_col not in df.columns or not np.issubdtype(df[target_col].dtype, np.number):
+    if not 0 < pvalue < 1:
+        print("Error: pvalue debe estar entre 0 y 1, exclusivo.")
         return None
-    significant_features = []
-    for feature in df.select_dtypes(include=['object']).columns:
-        _, p_val, _, _ = chi2_contingency(pd.crosstab(df[feature], df[target_col]))
-        if p_val < pvalue:
-            significant_features.append(feature)
-    return significant_features if significant_features else None
+    significant_cats = []
+    for col in df.select_dtypes(include=['object', 'category']).columns:
+        grouped = df.groupby(col, observed=True)[target_col].apply(list)
+        f_val, p_val = stats.f_oneway(*grouped)
+        if p_val <= pvalue:
+            significant_cats.append(col)
+    return significant_cats
 
 def plot_features_cat_regression(df, target_col="", columns=[], pvalue=0.05, with_individual_plot=False):
     """
