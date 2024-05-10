@@ -5,15 +5,15 @@ import matplotlib.pyplot as plt
 from scipy.stats import chi2_contingency, pearsonr
 
 def describe_df(df):
-    """
-    Genera un resumen descriptivo del DataFrame.
+    '''
+    Describe el dtype de cada columna, los valores nulos en %, quantos valores únicos hay en la columna y el % de cardinalidad.
 
     Argumentos:
-    df (pandas.DataFrame): El DataFrame del que se va a generar el resumen.
+    data(pd.DataFrame): DataFrame de Pandas inicial
 
     Retorna:
-    pandas.DataFrame: Un DataFrame que contiene el resumen descriptivo del DataFrame de entrada.
-    """
+    pd.DataFrame: Data inicial transformado con los valores descritos   
+    '''
     resumen = pd.DataFrame({
         'Tipo de dato': df.dtypes,
         'Porcentaje de nulos': df.isnull().mean() * 100,
@@ -72,12 +72,16 @@ def get_features_num_regression(df, target_col, umbral_corr, pvalue=None):
     Retorna:
     list: Una lista con los nombres de las columnas numéricas que cumplen con los criterios de correlación y p-value.
     """
-    if not 0 <= umbral_corr <= 1:
-        print("Error: El umbral de correlación debe estar entre 0 y 1.")
+    # Comprobamos que el umbral de correlacion esté bien puesto
+    if umbral_corr > 1 or umbral_corr < 0:
+        print("Error: 'umbral_corr' debe ser un valor entre 0 y 1.")
         return None
-    if pvalue is not None and not 0 < pvalue < 1:
-        print("Error: pvalue debe estar entre 0 y 1, exclusivo.")
-        return None
+    
+    # Comprobamos que el p-value esté bien puesto
+    if pvalue is not None and (pvalue <= 0 or pvalue >= 1):
+        print("Error: 'pvalue' debe ser un valor entre 0 y 1.")
+        return None 
+       
     features = []
     for col in df.select_dtypes(include=[np.number]).columns:
         if col != target_col:
