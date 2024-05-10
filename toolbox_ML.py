@@ -72,16 +72,15 @@ def get_features_num_regression(df, target_col, umbral_corr, pvalue=None):
     Retorna:
     list: Una lista con los nombres de las columnas numéricas que cumplen con los criterios de correlación y p-value.
     """
-    # Comprobamos que el umbral de correlacion esté bien puesto
+
     if umbral_corr > 1 or umbral_corr < 0:
         print("Error: 'umbral_corr' debe ser un valor entre 0 y 1.")
         return None
     
-    # Comprobamos que el p-value esté bien puesto
     if pvalue is not None and (pvalue <= 0 or pvalue >= 1):
         print("Error: 'pvalue' debe ser un valor entre 0 y 1.")
-        return None 
-       
+        return None
+        
     features = []
     for col in df.select_dtypes(include=[np.number]).columns:
         if col != target_col:
@@ -89,6 +88,7 @@ def get_features_num_regression(df, target_col, umbral_corr, pvalue=None):
             if abs(corr) >= umbral_corr and (pvalue is None or pval <= pvalue):
                 features.append(col)
     return features
+
 
 def plot_features_num_regression(df, target_col="", umbral_corr=0, pvalue=None):
     """
@@ -104,9 +104,10 @@ def plot_features_num_regression(df, target_col="", umbral_corr=0, pvalue=None):
     list or None: Una lista con las características que cumplen con los criterios especificados, o None si hay errores.
     """
     selected_features = get_features_num_regression(df, target_col, umbral_corr, pvalue)
-    sns.pairplot(df, vars= selected_features, hue = target_col)
+    fig = sns.pairplot(df, vars= selected_features, hue = target_col)
     plt.show()
-    return 
+    return fig
+
 
 def get_features_cat_regression(df, target_col, pvalue=0.05):
     """
@@ -120,12 +121,8 @@ def get_features_cat_regression(df, target_col, pvalue=0.05):
     Retorna:
     list or None: Una lista con las características categóricas significativas para el modelo de regresión, o None si hay errores.
     """
-    if not 0 < pvalue < 1:
-        print("Error: pvalue debe estar entre 0 y 1, exclusivo.")
-        return None
-    
-    if isinstance(target_col, (float, int)):
-        print("Error: La columna target tiene que ser una variable numérica continua")
+    if pvalue <= 0 or pvalue >= 1:
+        print("Error: 'pvalue' debe ser un valor entre 0 y 1.")
         return None
     
     significant_cats = []
@@ -135,6 +132,7 @@ def get_features_cat_regression(df, target_col, pvalue=0.05):
         if p_val <= pvalue:
             significant_cats.append(col)
     return significant_cats
+
 
 def plot_features_cat_regression(df, target_col="", columns=[], pvalue=0.05, with_individual_plot=False):
     """
@@ -155,9 +153,9 @@ def plot_features_cat_regression(df, target_col="", columns=[], pvalue=0.05, wit
         return None
     for feature in significant_features:
         #if with_individual_plot:
-        sns.histplot(data=df, x=feature, hue=target_col, multiple='stack')
+        fig = sns.histplot(data=df, x=feature, hue=target_col, multiple='stack')
         plt.title(f'Histograma agrupado para {feature} en relación con {target_col}')
         plt.xlabel(feature)
         plt.ylabel('Frecuencia')
         plt.show()
-    return 
+    return fig
